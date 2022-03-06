@@ -8,15 +8,19 @@ import com.emp.payroll.EmployeePayRollService.IOService;
 
 public class EmployeePayRollService {
 	
-	public EmployeePayRollService() {
-		
-	};
 	public enum IOService{CONSOLE_IO,FILE_IO,DB_IO,REST_IO}
+	
+	public EmployeePayRollDBService employeePayRollDBService;
 	public List<EmployeePayRollData> employeePayRollList = new ArrayList<EmployeePayRollData>();
 	public EmployeePayRollService(List<EmployeePayRollData> list) {
+		this();
 		employeePayRollList = list;
 	}
-
+	public EmployeePayRollService() {
+		employeePayRollDBService = EmployeePayRollDBService.getInstance();
+		};
+		
+		
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		ArrayList<EmployeePayRollData> employeePayRollList = new ArrayList<>();
@@ -65,6 +69,33 @@ public class EmployeePayRollService {
 		    return new EmployeePayRollFileIOService().countEntries();
 			}
 		return 0;
+	}
+
+
+
+	public List<EmployeePayRollData> readEmployeePayroll(IOService ioService) {
+		if(ioService.equals(ioService.DB_IO)) {
+			this.employeePayRollList = employeePayRollDBService.readData();
+		}
+			
+		return this.employeePayRollList;
+	}
+
+	public void updateEmployeeSalary(String name, double salary) {
+		int result = employeePayRollDBService.updateEmployeeData(name, salary);
+		if (result == 0) return;
+		EmployeePayRollData employeePayROllData = this.getEmployeePayROllData(name);
+		if(employeePayROllData != null) employeePayROllData.salary = salary;
+	}
+
+	private EmployeePayRollData getEmployeePayROllData(String name) {
+		return 	this.employeePayRollList.stream().filter(empPayROllDataItem ->empPayROllDataItem.name.equals(name)).findFirst().orElse(null);
+	
+	}
+
+	public boolean checkEmployeePayRollSyncWithDataBase(String name) {
+		List<EmployeePayRollData> employeePayRollList =  employeePayRollDBService.getEmployeePayRollData(name);
+		return employeePayRollList.get(0).equals(getEmployeePayROllData(name));
 	}
 
 }
