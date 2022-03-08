@@ -1,7 +1,9 @@
 package com.emp.payroll.test;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,5 +47,33 @@ public class EmployeePayRollServiceTest {
 		Assert.assertTrue(result);
 	}
     
+	@Test
+	public void givenDateRangeWhenRetrivedShouldMatchEmployeeCount() {
+		EmployeePayRollService employeePayRollService = new EmployeePayRollService();
+		employeePayRollService.readEmployeePayroll(IOService.DB_IO);
+		LocalDate startDate = LocalDate.of(2018, 01, 01);
+		LocalDate endDate = LocalDate.now();
+		List<EmployeePayRollData> empPayRollData = employeePayRollService.readEmployeePayRollForDateRange(IOService.DB_IO,startDate,endDate);
+		Assert.assertEquals(6, empPayRollData.size());
+	}
+	
+	@Test
+	public void givenPayRollDataWhenAvgSalaryRetrievedGenderShouldReturnProperValue() {
+		EmployeePayRollService employeePayRollService = new EmployeePayRollService();
+		employeePayRollService.readEmployeePayroll(IOService.DB_IO);
+		Map<String,Double> avgSalaryByGender = employeePayRollService.readAvgSalaryByGender(IOService.DB_IO);
+		Assert.assertTrue(avgSalaryByGender.get("M").equals(50000.0) && avgSalaryByGender.get("F").equals(30000.0));
+	}
+	
+	@Test
+	public void givenNewEmployeeWhenAddedShouldSyncWithDB() {
+		EmployeePayRollService employeePayRollService = new EmployeePayRollService();
+		employeePayRollService.readEmployeePayroll(IOService.DB_IO);
+		employeePayRollService.addEmployeePayroll("Mark",50000.0,LocalDate.now(),"M");
+		boolean result = employeePayRollService.checkEmployeePayRollSyncWithDataBase("Mark");
+		Assert.assertTrue(result);
+	}
+	
+	
 	
 }

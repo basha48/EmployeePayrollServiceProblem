@@ -1,5 +1,6 @@
 package com.emp.payroll;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -96,6 +97,25 @@ public class EmployeePayRollService {
 	public boolean checkEmployeePayRollSyncWithDataBase(String name) {
 		List<EmployeePayRollData> employeePayRollList =  employeePayRollDBService.getEmployeePayRollData(name);
 		return employeePayRollList.get(0).equals(getEmployeePayROllData(name));
+	}
+	public List<EmployeePayRollData> readEmployeePayRollForDateRange(IOService ioService, LocalDate startDate,
+			LocalDate endDate) {
+		if(ioService.equals(ioService.DB_IO)) {
+			return employeePayRollDBService.getEmployeePayRollForDateRange(startDate,endDate);
+		}
+			
+		return null;
+		
+	}
+	public java.util.Map<String, Double> readAvgSalaryByGender(IOService ioService) {
+		if(ioService.equals(ioService.DB_IO)) {
+			return employeePayRollDBService.getAvgSalaryByGender();
+		}
+	return null;
+	}
+	public void addEmployeePayroll(String name, double salary, LocalDate startDate, String gender) {
+		employeePayRollList.add(employeePayRollDBService.addEmployeePayRoll(name,salary,startDate,gender));
+		
 	}
 
 }
